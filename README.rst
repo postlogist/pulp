@@ -26,7 +26,7 @@ Otherwise follow the download instructions on the PyPi page.
 
 If you want to install the latest version from github you can run the following::
 
-    python -m pip install -U git+https://github.com/coin-or/pulp
+    python -m pip install -U git+https://github.com/postlogist/pulp
 
 
 On Linux and OSX systems the tests must be run to make the default
