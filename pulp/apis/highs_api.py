@@ -142,13 +142,36 @@ class HiGHS_CMD(LpSolver_CMD):
 
         with open(tmpOptions, "w") as options_file:
             options_file.write("\n".join(file_options))
-        process = subprocess.run(command, stdout=sys.stdout, stderr=sys.stderr)
+        # test - added by postlogist
+        if self.msg:
+            pipe = None
+        else:
+            pipe = open(os.devnull, "w")
+        
+        lp_status = None
+            
+#        process = subprocess.run(command, stdout=sys.stdout, stderr=sys.stderr, universal_newlines=True)
+        with subprocess.Popen(
+                    #cmd.split(),
+                    command,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True,
+                ) as proc, open(tmpLog, "w") as log_file:
+                    for line in proc.stdout:
+                        if self.msg:
+                            sys.__stdout__.write(line)
+                        log_file.write(line)
+
+
+        
 
         # HiGHS return code semantics (see: https://github.com/ERGO-Code/HiGHS/issues/527#issuecomment-946575028)
         # - -1: error
         # -  0: success
         # -  1: warning
-        if process.returncode == -1:
+        return_code = proc.wait()
+        if return_code == -1:
             raise PulpSolverError("Error while executing HiGHS")
 
         with open(highs_log_file, "r") as log_file:
